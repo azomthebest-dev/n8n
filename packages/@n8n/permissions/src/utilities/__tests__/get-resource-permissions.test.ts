@@ -6,6 +6,7 @@ import { getResourcePermissions } from '../get-resource-permissions.ee';
 describe('permissions', () => {
 	it('getResourcePermissions for empty scopes', () => {
 		expect(getResourcePermissions()).toEqual({
+			aiAssistant: {},
 			annotationTag: {},
 			auditLogs: {},
 			banner: {},
@@ -23,7 +24,9 @@ describe('permissions', () => {
 			orchestration: {},
 			project: {},
 			saml: {},
+			provisioning: {},
 			securityAudit: {},
+			securitySettings: {},
 			sourceControl: {},
 			tag: {},
 			user: {},
@@ -39,6 +42,10 @@ describe('permissions', () => {
 			mcpApiKey: {},
 			role: {},
 			chatHub: {},
+			chatHubAgent: {},
+			breakingChanges: {},
+			apiKey: {},
+			credentialResolver: {},
 		});
 	});
 	it('getResourcePermissions', () => {
@@ -73,9 +80,12 @@ describe('permissions', () => {
 			'workflow:update',
 			'folder:create',
 			'insights:list',
+			'breakingChanges:list',
+			'apiKey:manage',
 		];
 
 		const permissionRecord: PermissionsRecord = {
+			aiAssistant: {},
 			annotationTag: {},
 			auditLogs: {},
 			banner: {},
@@ -106,9 +116,11 @@ describe('permissions', () => {
 			},
 			saml: {},
 			oidc: {},
+			provisioning: {},
 			mcp: {},
 			mcpApiKey: {},
 			securityAudit: {},
+			securitySettings: {},
 			sourceControl: {},
 			tag: {
 				create: true,
@@ -149,6 +161,14 @@ describe('permissions', () => {
 			workflowTags: {},
 			role: {},
 			chatHub: {},
+			chatHubAgent: {},
+			breakingChanges: {
+				list: true,
+			},
+			apiKey: {
+				manage: true,
+			},
+			credentialResolver: {},
 		};
 
 		expect(getResourcePermissions(scopes)).toEqual(permissionRecord);

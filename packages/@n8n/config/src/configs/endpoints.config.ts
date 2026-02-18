@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { Config, Env, Nested } from '../decorators';
 
 @Config
@@ -65,6 +67,14 @@ class PrometheusMetricsConfig {
 	/** Whether to include a label for workflow name on workflow metrics. */
 	@Env('N8N_METRICS_INCLUDE_WORKFLOW_NAME_LABEL')
 	includeWorkflowNameLabel: boolean = false;
+
+	/** Whether to include workflow execution statistics as metrics. */
+	@Env('N8N_METRICS_INCLUDE_WORKFLOW_STATISTICS')
+	includeWorkflowStatistics: boolean = false;
+
+	/** How often (in seconds) to update workflow statistics metrics. */
+	@Env('N8N_METRICS_WORKFLOW_STATISTICS_INTERVAL')
+	workflowStatisticsInterval: number = 300;
 }
 
 @Config
@@ -127,4 +137,11 @@ export class EndpointsConfig {
 	/** Colon-delimited list of additional endpoints to not open the UI on. */
 	@Env('N8N_ADDITIONAL_NON_UI_ROUTES')
 	additionalNonUIRoutes: string = '';
+
+	/** Path for the health check endpoint. */
+	@Env(
+		'N8N_ENDPOINT_HEALTH',
+		z.string().transform((val) => (val.startsWith('/') ? val : `/${val}`)),
+	)
+	health: string = '/healthz';
 }

@@ -1,36 +1,19 @@
-ARG NODE_VERSION=20
-
-
 FROM node:20-alpine
 
-ARG NODE_VERSION
+RUN apk add --no-cache git python3 make g++ tini
 
-# Install all dependencies in a single layer to minimize image size
-RUN apk add --no-cache busybox-binsh && \
-    # Install fonts
-    apk --no-cache add --virtual .build-deps-fonts msttcorefonts-installer fontconfig && \
-    update-ms-fonts && \
-    fc-cache -f && \
-    apk del .build-deps-fonts && \
-    find /usr/share/fonts/truetype/msttcorefonts/ -type l -exec unlink {} \; && \
-    # Install OS dependencies
-    apk update && \
-    apk upgrade --no-cache && \
-    apk add --no-cache \
-        git \
-        openssh \
-        openssl \
-        graphicsmagick=1.3.45-r0 `# pinned to avoid ghostscript-fonts (AGPL)` \
-        tini \
-        tzdata \
-        ca-certificates \
-        libc6-compat && \
-    # Cleanup
-    rm -rf /tmp/* /root/.npm /root/.cache/node /opt/yarn* && \
-    apk del apk-tools
+WORKDIR /app
 
-WORKDIR /home/node
-# DHI images use a non-standard global npm path, so we need to set NODE_PATH
-# to allow externally installed npm packages to be found by require()
-ENV NODE_PATH=/opt/nodejs/node-v${NODE_VERSION}/lib/node_modules
-EXPOSE 5678/tcp
+COPY . .
+
+RUN corepack enable
+RUN corepack prepare pnpm@9 --activate
+
+ENV CI=true
+
+RUN pnpm install
+RUN pnpm build
+
+EXPOSE 5678
+
+CMD ["pnpm", "start"]
